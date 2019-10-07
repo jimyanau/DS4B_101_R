@@ -71,7 +71,7 @@ dir_info("./data_raw") %>%
     ## 
     ## $orderlines
     ## # A tibble: 15,644 x 7
-    ##    X__1  order.id order.line order.date          customer.id product.id
+    ##    ...1  order.id order.line order.date          customer.id product.id
     ##    <chr>    <dbl>      <dbl> <dttm>                    <dbl>      <dbl>
     ##  1 1            1          1 2011-01-07 00:00:00           2         48
     ##  2 2            1          2 2011-01-07 00:00:00           2         52
