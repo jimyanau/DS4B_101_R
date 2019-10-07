@@ -21,7 +21,7 @@ pacman::p_load(
     "tidyquant",  # used mainly for the ggplot plotting theme
     
     # Model
-    "tidymodels", # installs broom, infer, recipes, rsample, & yardstick
+    "tidymodels", # installs broom, infer, recipes, rsample, yardstick, parsnip & dials
     "umap",       # used for visualizing clusters
     
     # Other
