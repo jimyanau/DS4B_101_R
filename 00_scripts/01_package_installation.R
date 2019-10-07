@@ -1,10 +1,10 @@
 # DS4B 101 R: R FOR BUSINESS ANALYSIS
 # PACKAGE INSTALLATION
-# UPDATED 10-07-2019 TO USE INSTALL.LOAD::INSTALL_LOAD() BY STEVEN SANDERSON
+# UPDATED 10-07-2019 TO USE pacman::p_load() BY STEVEN SANDERSON
 
-if(!require(install.load)) install.packages("install.load")
+if(!require(pacman)) install.packages("pacman")
 
-install.load::install_load(
+pacman::p_load(
     # File System
     "fs",         # working with the file system
     
