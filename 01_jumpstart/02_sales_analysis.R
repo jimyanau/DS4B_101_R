@@ -42,10 +42,47 @@ bike_orderlines_joined_tbl <- orderlines_tbl %>%
 bike_orderlines_joined_tbl %>% glimpse()
 
 # 5.0 Wrangling Data ----
+bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
+    # Separate description field into it's sub componenets
+    # Category 1, Category 2 and frame.material
+    separate(
+        col = description
+        , into = c('category.1','category.2','frame.material')
+        , sep = ' - '
+        , remove = T
+        ) %>%
+    # separate location column
+    separate(
+        col = location
+        , into = c("city","state")
+        , sep = ', '
+        , remove = F
+    ) %>%
+    # Get total order price qty * unit price
+    mutate(
+        total.price = quantity * price
+    ) %>%
+    # Reorg with select()
+    select(-...1, -location) %>%
+    select(-ends_with(".id")) %>%
+    # Add order.id back in
+    bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>%
+    # Reorder columns
+    select(
+        contains("date")
+        , contains("id")
+        , contains("order")
+        , quantity
+        , price
+        , total.price
+        , everything()
+    ) %>%
+    # change column names with rename()
+    set_names(
+        names(.) %>% str_replace_all("\\.", "_")
+    )
 
-
-
-
+bike_orderlines_wrangled_tbl %>% glimpse()
 
 # 6.0 Business Insights ----
 
@@ -53,12 +90,39 @@ bike_orderlines_joined_tbl %>% glimpse()
 # 6.1 Sales by Year ----
 
 # Step 1 - Manipulate
-
+sales_by_year_tbl <- bike_orderlines_wrangled_tbl %>%
+    # Get columns we want
+    select(order_date, total_price) %>%
+    mutate(year = year(order_date)) %>%
+    # groupings
+    group_by(year) %>%
+    summarize(sales = sum(total_price)) %>%
+    ungroup() %>%
+    # get dollar text
+    mutate(sales_text = scales::dollar(sales))
 
 
 
 # Step 2 - Visualize
-
+sales_by_year_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = sales
+        )
+    ) +
+    geom_col(
+        fill = palette_light()[[1]]
+    ) +
+    geom_label(
+        aes(
+            label = sales_text
+        )
+    )
+    theme_tq() +
+    labs(
+        title = "Sales by Year"
+    )
 
 
 # 6.2 Sales by Year and Category 2 ----
