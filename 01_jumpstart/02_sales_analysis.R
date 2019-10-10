@@ -118,24 +118,66 @@ sales_by_year_tbl %>%
         aes(
             label = sales_text
         )
-    )
+    ) +
+    geom_smooth(
+        method = "lm"
+        , se = F
+    ) +
     theme_tq() +
+    scale_y_continuous(
+        labels = scales::dollar
+    ) +
     labs(
-        title = "Sales by Year"
+        title = "Revenue by Year"
+        , subtitle = "Upward Trend"
+        , y = "Revenue"
+        , x = ""
     )
 
 
 # 6.2 Sales by Year and Category 2 ----
 
-
 # Step 1 - Manipulate
-
+sales_by_year_cat2_tbl <- bike_orderlines_wrangled_tbl %>% 
+    select(
+        order_date
+        , total_price
+        , category_2
+    ) %>%
+    mutate(year = year(order_date)) %>%
+    group_by(year, category_2) %>%
+    summarize(sales = sum(total_price)) %>%
+    ungroup() %>%
+    mutate(sales_text = scales::dollar(sales))
 
 
 
 # Step 2 - Visualize
-
-
+sales_by_year_cat2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = sales
+            , fill = category_2
+        )
+    ) +
+    geom_col() + 
+    facet_wrap(
+        ~ category_2
+        , scales = "free_y"
+    ) +
+    geom_smooth(
+        method = 'lm'
+        , se = F
+    ) +
+    scale_y_continuous(labels = scales::dollar) +
+    theme_tq() +
+    labs(
+        title = "Revenue by Year and Category 2"
+        , y = "Revenue"
+        , x = ""
+        , fill = "Producet Secondary Category"
+    )
 
 
 # 7.0 Writing Files ----
