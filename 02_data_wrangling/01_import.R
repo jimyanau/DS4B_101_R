@@ -39,5 +39,17 @@ excel_sheets("00_data/bike_sales/data_wrangled/bike_orderlines.xlsx")
 
 
 # 4.0 Databases  ----
+con <- dbConnect(drv = SQLite(), dbname = "00_data/chinook/Chinook_Sqlite.sqlite")
 
+dbListTables(con)
 
+album_tbl <- tbl(con, "Album") %>% 
+    collect()
+album_tbl
+
+artist_tbl <- tbl(con, "Artist") %>%
+    collect()
+artist_tbl
+
+dbDisconnect(con)
+con
