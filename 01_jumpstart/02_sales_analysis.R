@@ -181,12 +181,14 @@ sales_by_year_cat2_tbl %>%
 
 
 # 7.0 Writing Files ----
-
+fs::dir_create("00_data/bike_sales/data_wrangled_student")
 
 # 7.1 Excel ----
-
+bike_orderlines_wrangled_tbl %>%
+    write_xlsx("00_data/bike_sales/data_wrangled_student/bike_orderlines.xlsx")
 
 # 7.2 CSV ----
-
+bike_orderlines_wrangled_tbl %>%
+    write_csv("00_data/bike_sales/data_wrangled_student/bike_orderlines.csv")
 
 # 7.3 RDS ----
