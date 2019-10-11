@@ -33,9 +33,9 @@ bike_orders_rds_tbl <- read_rds("00_data/bike_sales/data_wrangled/bike_orderline
 bike_orders_rds_tbl
 
 
-# 3.0 Excel ----
-
-
+ # 3.0 Excel ----
+bike_orders_xlsx_tbl <- read_excel("00_data/bike_sales/data_wrangled/bike_orderlines.xlsx")
+excel_sheets("00_data/bike_sales/data_wrangled/bike_orderlines.xlsx")
 
 
 # 4.0 Databases  ----
