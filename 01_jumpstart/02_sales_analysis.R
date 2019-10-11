@@ -192,3 +192,5 @@ bike_orderlines_wrangled_tbl %>%
     write_csv("00_data/bike_sales/data_wrangled_student/bike_orderlines.csv")
 
 # 7.3 RDS ----
+bike_orderlines_wrangled_tbl %>%
+    write_rds("00_data/bike_sales/data_wrangled_student/bike_orderlines.rds")
