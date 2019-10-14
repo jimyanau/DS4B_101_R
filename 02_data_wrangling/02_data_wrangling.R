@@ -1,9 +1,11 @@
 # DS4B 101-R: R FOR BUSINESS ANALYSIS ----
 # DATA WRANGLING OVERVIEW ----
 
-
-library(tidyverse)
-library(readxl)
+if(!require(pacman)) install.packages("pacman")
+pacman::p_load(
+    "tidyverse"
+    , "readxl"
+)
 
 bikes_tbl           <- read_excel("00_data/bike_sales/data_raw/bikes.xlsx")
 orderlines_tbl      <- read_excel("00_data/bike_sales/data_raw/orderlines.xlsx")
