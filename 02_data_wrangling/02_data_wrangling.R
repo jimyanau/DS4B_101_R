@@ -102,10 +102,19 @@ bike_orderlines_prices <- bike_orderlines_tbl %>%
     select(order_date, model, quantity, price) %>%
     mutate(total_price = quantity * price)
 
-# Overwrite a column
+# Transformations
 bike_orderlines_prices %>%
     mutate(total_price_log = log(total_price)) %>%
     mutate(total_price_sqrt = sqrt(total_price))
+
+# Adding a flag
+bike_orderlines_prices %>%
+    mutate(
+        is_supersix = model %>% 
+            str_to_lower() %>% 
+            str_detect("supersix")
+        ) %>%
+    filter(is_supersix)
 
 # 5.0 Grouping & Summarizing with group_by() and summarize() ----
 
