@@ -116,9 +116,31 @@ bike_orderlines_prices %>%
         ) %>%
     filter(is_supersix)
 
+bike_orderlines_prices %>%
+    mutate(total_price_binned = ntile(total_price, 3))
+
+# If-then inside of mutate case_when() binning more flexible
+bike_orderlines_prices %>%
+    mutate(total_price_binned = ntile(total_price, 3)) %>%
+    mutate(total_price_binned_2 = case_when(
+        total_price > quantile(total_price, 0.66) ~ "High"
+        , total_price > quantile(total_price, 0.33) ~ "Medium"
+        , T ~ "Low"
+    )) %>%
+    mutate(total_price_binned_3 = case_when(
+        total_price > quantile(total_price, 0.75) ~ "High"
+        , total_price > quantile(total_price, 0.25) ~ "Medium"
+        , T ~"Low"
+    ))
+
+bike_orderlines_prices %>%
+    mutate(bike_type = case_when(
+        model %>% str_to_lower() %>% str_detect("supersix") ~ "Supersix"
+        , model %>% str_to_lower() %>% str_detect("Jekyll") ~ "Jekyll"
+        , T ~ "Not Supersix or Jekyll"
+    ))
+
 # 5.0 Grouping & Summarizing with group_by() and summarize() ----
-
-
 
 
 # 6.0 Renaming columns with rename() and set_names() ----
