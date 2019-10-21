@@ -98,7 +98,9 @@ bike_orderlines_tbl %>%
     arrange(category_1)
 
 # 4.0 Adding Columns with mutate() ----
-
+biker_orderlines_prices <- bike_orderlines_tbl %>%
+    select(order_date, model, quantity, price) %>%
+    mutate(total_price = quantity * price)
 
 
 
