@@ -141,6 +141,35 @@ bike_orderlines_prices %>%
     ))
 
 # 5.0 Grouping & Summarizing with group_by() and summarize() ----
+# Basics
+bike_orderlines_prices %>%
+    summarise(
+        revenue = sum(total_price)
+    )
+
+bike_orderlines_tbl %>%
+    group_by(category_1) %>%
+    summarise(revenue = sum(total_price))
+
+bike_orderlines_tbl %>%
+    group_by(category_1, category_2) %>%
+    summarise(revenue = sum(total_price)) %>%
+    ungroup() %>%
+    arrange(desc(revenue))
+
+# Summary functions
+bike_orderlines_tbl %>%
+    group_by(category_1, category_2) %>%
+    summarise(
+        count = n()
+        , avg = mean(total_price)
+        , median = median(total_price)
+        , sd = sd(total_price)
+        , min = min(total_price)
+        , max = max(total_price)
+        ) %>%
+    ungroup() %>%
+    arrange(desc(count))
 
 
 # 6.0 Renaming columns with rename() and set_names() ----
