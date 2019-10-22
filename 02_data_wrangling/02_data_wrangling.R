@@ -171,6 +171,17 @@ bike_orderlines_tbl %>%
     ungroup() %>%
     arrange(desc(count))
 
+bike_orderlines_missing <- bike_orderlines_tbl %>%
+    mutate(total_price = c(rep(NA, 4), total_price[5:nrow(.)]))
+
+bike_orderlines_missing %>%
+    summarise_all(~ sum(is.na(.)))
+ 
+bike_orderlines_missing %>%
+    summarise_all(~ sum(is.na(.)) / length(.))
+
+bike_orderlines_missing %>%
+    filter(!is.na(total_price))
 
 # 6.0 Renaming columns with rename() and set_names() ----
 
