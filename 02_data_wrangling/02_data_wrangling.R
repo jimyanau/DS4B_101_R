@@ -186,36 +186,107 @@ bike_orderlines_missing %>%
 # 6.0 Renaming columns with rename() and set_names() ----
 
 # 6.1 rename: One column at a time ----
+bikeshop_revenue <- bike_orderlines_tbl %>%
+    select(bikeshop_name, category_1, total_price) %>%
+    group_by(bikeshop_name, category_1) %>%
+    summarise(sales = sum(total_price)) %>%
+    ungroup() %>%
+    arrange(desc(sales))
 
+bikeshop_revenue %>%
+    rename(
+        `Bikeshop Name` = bikeshop_name
+        , `Primary Category` = category_1
+        , `Revenue` = sales
+    )
 
 # 6.2 set_names: All columns at once ---
+bikeshop_revenue %>%
+    set_names(
+        c(
+            "Bikeshop Name"
+            , "Primary Category"
+            , "Sales"
+        )
+    )
 
-
-
+bikeshop_revenue %>%
+    set_names(names(.) %>% str_replace("_", " ") %>% str_to_title())
 
 # 7.0 Reshaping (Pivoting) Data with spread() and gather() ----
 
-# 7.1 spread(): Long to Wide ----
+# 7.1 spread(): Long to Wide ---- pivot_wider()
+bikeshop_revenue_tbl <- bikeshop_revenue %>%
+    pivot_wider(
+        id_cols = bikeshop_name
+        , names_from = category_1
+        , values_from = sales
+    ) %>%
+    mutate(
+        `Total Sales` = scales::dollar(Mountain + Road)
+        , Mountain = scales::dollar(Mountain)
+        , Road = scales::dollar(Road)
+    )
 
 
-# 7.2 gather(): Wide to Long ----
-
-
+# 7.2 gather(): Wide to Long ---- pivot_longer
+bikeshop_revenue_tbl %>%
+    select(bikeshop_name, Mountain, Road) %>%
+    pivot_longer(
+        cols = c(Mountain, Road)
+        , names_to = "category_1"
+        , values_to = "sales"
+    ) %>%
+    mutate(sales = sales %>% str_remove_all("\\$|,") %>% as.double()) %>%
+    arrange(desc(sales))
 
 
 # 8.0 Joining Data by Key(s) with left_join() (e.g. VLOOKUP in Excel) ----
-
-
-
+orderlines_tbl %>%
+    left_join(y = bikes_tbl, by = c("product.id" = "bike.id"))
 
 # 9.0 Binding Data by Row or by Column with bind_rows() and bind_col() ----
 
 # 9.1 bind_cols() ----
-
+bike_orderlines_tbl %>%
+    select(-contains("order")) %>%
+    bind_cols(
+        bike_orderlines_tbl %>% select(order_id)
+    )
 
 
 
 # 9.2 bind_rows() ----
+train_tbl <- bike_orderlines_tbl %>%
+    slice(1:(nrow(.)/2))
 
+test_tbl <- bike_orderlines_tbl %>%
+    slice((nrow(.)/2+1):nrow(.))
 
+full_tbl <- train_tbl %>%
+    bind_rows(test_tbl)
 
+# 10.1 separate() and unite() ----
+bike_orderlines_tbl %>%
+    select(order_date) %>%
+    mutate(order_date = as.character(order_date)) %>%
+    separate(
+        col = order_date
+        , into = c("year","month","day")
+        , sep = "-"
+        , remove = F
+        ) %>%
+    mutate(
+        year = as.numeric(year)
+        , month = as.numeric(month)
+        , day = as.numeric(day)
+    ) %>%
+    unite(
+        order_date_united
+        , year
+        , month
+        , day
+        , sep = "-"
+        , remove = F
+    ) %>%
+    mutate(order_date_united = as.Date(order_date_united))
