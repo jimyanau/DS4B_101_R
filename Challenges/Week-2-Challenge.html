@@ -556,7 +556,7 @@ summary {
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Load libraries</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># Read bike orderlines data</span></a>
-<a class="sourceLine" id="cb2-2" title="2">path_bike_orderlines &lt;-<span class="st"> &quot;00_data/bike_sales/data_wrangled/bike_orderlines.rds&quot;</span></a>
+<a class="sourceLine" id="cb2-2" title="2">path_bike_orderlines &lt;-<span class="st"> &quot;../00_data/bike_sales/data_wrangled/bike_orderlines.rds&quot;</span></a>
 <a class="sourceLine" id="cb2-3" title="3">bike_orderlines_tbl &lt;-<span class="st"> </span><span class="kw">read_rds</span>(path_bike_orderlines)</a>
 <a class="sourceLine" id="cb2-4" title="4"></a>
 <a class="sourceLine" id="cb2-5" title="5"><span class="kw">glimpse</span>(bike_orderlines_tbl)</a></code></pre></div>
@@ -576,7 +576,7 @@ summary {
 ## $ city           &lt;chr&gt; &quot;Ithaca&quot;, &quot;Ithaca&quot;, &quot;Kansas City&quot;, &quot;Kansas City...
 ## $ state          &lt;chr&gt; &quot;NY&quot;, &quot;NY&quot;, &quot;KS&quot;, &quot;KS&quot;, &quot;KY&quot;, &quot;KY&quot;, &quot;KY&quot;, &quot;KY&quot;,...</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># Read bikes data</span></a>
-<a class="sourceLine" id="cb4-2" title="2">path_bikes &lt;-<span class="st"> &quot;00_data/bike_sales//data_raw/bikes.xlsx&quot;</span></a>
+<a class="sourceLine" id="cb4-2" title="2">path_bikes &lt;-<span class="st"> &quot;../00_data/bike_sales//data_raw/bikes.xlsx&quot;</span></a>
 <a class="sourceLine" id="cb4-3" title="3">bikes_tbl &lt;-<span class="st"> </span>readxl<span class="op">::</span><span class="kw">read_excel</span>(path_bikes)</a>
 <a class="sourceLine" id="cb4-4" title="4"></a>
 <a class="sourceLine" id="cb4-5" title="5"><span class="kw">glimpse</span>(bikes_tbl)</a></code></pre></div>

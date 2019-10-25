@@ -43,7 +43,7 @@ library(tidyverse)
 
 ```{r}
 # Read bike orderlines data
-path_bike_orderlines <- "00_data/bike_sales/data_wrangled/bike_orderlines.rds"
+path_bike_orderlines <- "../00_data/bike_sales/data_wrangled/bike_orderlines.rds"
 bike_orderlines_tbl <- read_rds(path_bike_orderlines)
 
 glimpse(bike_orderlines_tbl)
@@ -51,7 +51,7 @@ glimpse(bike_orderlines_tbl)
 
 ```{r}
 # Read bikes data
-path_bikes <- "00_data/bike_sales//data_raw/bikes.xlsx"
+path_bikes <- "../00_data/bike_sales//data_raw/bikes.xlsx"
 bikes_tbl <- readxl::read_excel(path_bikes)
 
 glimpse(bikes_tbl)
