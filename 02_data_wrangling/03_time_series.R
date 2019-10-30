@@ -37,20 +37,27 @@ order_date_tbl %>%
 "January 1, 1985" %>% mdy()
 
 # Extractor
+"2011-01-01" %>% ymd() %>% year()
 
+"2011-01-01" %>% ymd() %>% month()
 
+"2011-01-01" %>% ymd() %>% day()
+"2011-01-01" %>% ymd() %>% wday(label = T, abbr = T)
 
 # Helpers
-
-
+now()
+today()
 
 # Periods & Durations - Add/subract time to/from a date
-
-
+today() + days(12)  # period
+today() + ddays(12) # duration
+today() + years(4)  # period
+today() + dyears(4) # duration
 
 # Intervals - Calculate time-based distance 
-
-
+i <- interval(today(), today() + ddays(12))
+i / ddays(1)
+i / dminutes(1)
 
 # 2.0 Time-Based Data Grouping ----
 
