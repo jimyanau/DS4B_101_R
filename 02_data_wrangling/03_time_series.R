@@ -187,15 +187,37 @@ bike_sales_m_tbl %>%
 
 
 # 4.0 Cumulative Calculations ----
+bike_sales_y_tbl %>%
+    mutate(
+        cumulative_sales = cumsum(Sales)
+        #, cumulative_sales_avg = cummean(Sales)
+    ) %>%
+    mutate(cumulative_sales_pct = cumulative_sales / sum(Sales)) %>%
+    mutate(cumulative_sales_pct_chg = cumulative_sales_pct %>% scales::percent())
 
-
+bike_sales_m_tbl %>%
+    group_by(`Sales Year`) %>%
+    mutate(cumulative_sales = cumsum(Sales)) %>%
+    mutate(cumulative_sales_pct = cumulative_sales / sum(Sales)) %>%
+    mutate(cumulative_sales_pct_chr = cumulative_sales_pct %>% scales::percent())
 
 
 # 5.0 Rolling Calculations ----
-
+# i.e. moving average etc.
+bike_sales_m_tbl %>%
+    mutate(roll_mean_3 = rollmean(x = Sales, k = 3, na.pad = T, align = "right", fill = 0)) %>%
+    mutate(roll_mean_6 = rollmean(x = Sales, k = 6, na.pad = T, align = "right", fill = NA))
 
 
 # 6.0 Filtering Date Ranges ---- 
+bike_orderlines_tbl %>%
+    mutate(order_date = ymd(order_date)) %>%
+    filter(
+        order_date %>% between(left = ymd("2012-01-01"), right = ymd("2013-12-31"))
+    )
 
-
-
+bike_orderlines_tbl %>%
+    mutate(order_date = ymd(order_date)) %>%
+    filter(year(order_date) %in% c(2012, 2013))
+    
+    
