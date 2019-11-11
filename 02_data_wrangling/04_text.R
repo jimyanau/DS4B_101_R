@@ -188,4 +188,5 @@ bikes_tbl %>%
         )
     ) %>%
     
-    view()
+    # Get tier
+    mutate(model_tier = model %>% str_replace(pattern = model_base, replacement = "") %>% str_trim())
