@@ -153,6 +153,7 @@ bikes_tbl %>%
     mutate(model = case_when(
         model == "CAAD Disc Ultegra" ~ "CAAD12 Disc Ultegra"
         , model == "Syapse Carbon Tiagra" ~ "Synapse Carbon Tiagra"
+        , model == "Supersix Evo Hi-Mod Utegra" ~ "Supersix Evo Hi-Mod Ultegra"
         , TRUE ~ model
     )) %>%
     
