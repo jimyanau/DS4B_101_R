@@ -183,6 +183,9 @@ bikes_tbl %>%
             # Bad Habit
             , str_detect(str_to_lower(model_1), "bad") ~ str_c(model_1, model_2, sep = " ")
             
+            # Scalpel 29
+            , str_detect(str_to_lower(model_2), "29") ~ str_c(model_1, model_2, sep = " ")
+            
             # Catch all
             , TRUE ~ model_1
         )
