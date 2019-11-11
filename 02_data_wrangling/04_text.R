@@ -61,30 +61,54 @@ bike_orderlines_tbl %>%
 # 1.3 Separating Text: See tidyr::separate() ----
 
 # Vector
-
+c("Road - Elite Road - Carbon", "Road - Elite Road") %>%
+    str_split(pattern = " - ", simplify = T)
 
 # Tibble
-
+bikes_tbl %>%
+    select(description) %>%
+    separate(
+        col      = description
+        , into   = c(
+            "Category_1"
+            , "Category_2"
+            ,"Frame_Material"
+        )
+        , sep    = " - "
+        , remove = F
+    )
 
 
 # 1.4 Trimming Text ----
-
+" text with spaces    " %>% 
+    str_trim(side = "both")
 
 
 # 1.5 Replacement: Used with mutate() [and optionally case_when()] ----
 
 # Vector
-
+c("CAAD12","CAAD","CAAD8") %>%
+    str_replace(pattern = "[0-9]", replacement = "")
+c("CAAD12","CAAD","CAAD8") %>%
+    str_replace_all(pattern = "[0-9]", replacement = "")
 
 # Tibble
-
-
+bikes_tbl %>%
+    select(model) %>%
+    mutate(
+        model_num_removed = model %>% 
+            str_replace_all(pattern = "[0-9]",replacement = "") %>% 
+            str_trim()
+    )
 
 
 # 1.6 Formatting Numbers ----
 
 # values
-
+1e6 %>% scales::number(prefix = "$", big.mark = ",", suffix = "M")
+value <- 1e6
+(value / 1e6) %>% scales::number(prefix = "$", suffix = "M")
+value %>% scales::dollar()
 
 # percents
 
