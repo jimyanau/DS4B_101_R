@@ -149,9 +149,10 @@ bikes_tbl %>%
     
     select(model) %>%
     
-    # fix typo
+    # fix typo(s)
     mutate(model = case_when(
         model == "CAAD Disc Ultegra" ~ "CAAD12 Disc Ultegra"
+        , model == "Syapse Carbon Tiagra" ~ "Synapse Carbon Tiagra"
         , TRUE ~ model
     )) %>%
     
