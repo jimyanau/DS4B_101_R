@@ -50,6 +50,26 @@ sales_by_cat_2_tbl %>%
     theme_tq() +
     expand_limits(x = 0)
 
+plot_sales <- function(data){
+    data %>%
+        ggplot(
+            mapping = aes(
+                x = sales
+                , y = category_2
+            )
+        ) +
+        geom_point(size = 5, color = "#2c3e50") +
+        labs(
+            title = "Sales by Category 2"
+            , y = ""
+            , x = "Sales"
+        ) +
+        scale_x_continuous(labels = scales::dollar) +
+        theme_tq() +
+        expand_limits(x = 0)
+}
+
+plot_sales(sales_by_cat_2_tbl)
 
 # 3.0 Forcats Basics ----
 
