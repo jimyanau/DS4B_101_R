@@ -195,4 +195,16 @@ bikes_tbl %>%
     mutate(model_tier = model %>% str_replace(pattern = model_base, replacement = "") %>% str_trim()) %>%
     
     # remove unnecesary columns
-    select(-matches("[0-9]"))
+    select(-matches("[0-9]")) %>%
+    
+    # Create flags
+    mutate(
+        black      = model_tier %>% str_to_lower() %>% str_detect("black") %>% as.numeric()
+        , hi_mod   = model_tier %>% str_to_lower() %>% str_detect("hi-mod") %>% as.numeric()
+        , team     = model_tier %>% str_to_lower() %>% str_detect("team") %>% as.numeric()
+        , red      = model_tier %>% str_to_lower() %>% str_detect("red") %>% as.numeric()
+        , ultegra  = model_tier %>% str_to_lower() %>% str_detect("ultegra") %>% as.numeric()
+        , dura_ace = model_tier %>% str_to_lower() %>% str_detect("dura ace") %>% as.numeric()
+    ) %>%
+    
+    view()
