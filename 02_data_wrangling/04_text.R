@@ -189,4 +189,7 @@ bikes_tbl %>%
     ) %>%
     
     # Get tier
-    mutate(model_tier = model %>% str_replace(pattern = model_base, replacement = "") %>% str_trim())
+    mutate(model_tier = model %>% str_replace(pattern = model_base, replacement = "") %>% str_trim()) %>%
+    
+    # remove unnecesary columns
+    select(-matches("[0-9]"))
