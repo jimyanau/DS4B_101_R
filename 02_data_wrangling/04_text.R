@@ -165,6 +165,26 @@ bikes_tbl %>%
         , remove = F
         , fill   = "right"
         , extra  = "drop"
-    ) 
+    ) %>%
+    
+    # create base model feture
+    mutate(
+        model_base = case_when(
+            # Supersix Evo fix
+            str_detect(str_to_lower(model_1), "supersix") ~ str_c(model_1, model_2, sep = " ")
+            
+            # Beast of the east
+            , str_detect(str_to_lower(model_1), "beast") ~ str_c(model_1, model_2, model_3, model_4, sep = " ")
+            
+            # Fat CAAD
+            , str_detect(str_to_lower(model_1), "fat") ~ str_c(model_1, model_2, sep = " ")
+            
+            # Bad Habit
+            , str_detect(str_to_lower(model_1), "bad") ~ str_c(model_1, model_2, sep = " ")
+            
+            # Catch all
+            , TRUE ~ model_1
+        )
+    ) %>%
     
     view()
