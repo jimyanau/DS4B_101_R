@@ -24,10 +24,23 @@ bike_orderlines_tbl
 # 2.0 Motivating Example -----
 
 # Manipulation
-
+sales_by_cat_2_tbl <- bike_orderlines_tbl %>%
+    select(category_2, total_price) %>%
+    group_by(category_2) %>%
+    summarize(sales = sum(total_price)) %>%
+    ungroup() %>%
+    arrange(desc(sales)) %>%
+    mutate(category_2 = category_2 %>% as_factor() %>% fct_rev())
 
 # Plotting
-
+sales_by_cat_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = sales
+            , y = category_2
+        )
+    ) +
+    geom_point(size = 5)
 
 
 # 3.0 Forcats Basics ----
