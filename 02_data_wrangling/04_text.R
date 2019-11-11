@@ -111,21 +111,60 @@ value <- 1e6
 value %>% scales::dollar()
 
 # percents
-
-
+pct <- 0.15
+pct %>% scales::number(scale = 100, suffix = "%")
+pct %>% scales::percent()
 
 # 1.7 Formatting Column Names ----
 
 # Replacing text in column names
-
+bike_orderlines_tbl %>%
+    set_names(names(.) %>% str_replace(pattern = "_",".") %>% str_to_upper())
 
 
 # Appending text to column names
-
+bike_orderlines_tbl %>%
+    set_names(str_glue("{names(.)}_bike☼"))
 
 # Appending text to specific column names
+bike_orderlines_colnames_tbl <- bike_orderlines_tbl %>%
+    rename_at(
+        .vars = vars(model:frame_material)
+        , .funs = ~ str_c("prod_", .)
+    ) %>%
+    rename_at(
+        .vars = vars(bikeshop_name:state)
+        , .funs = ~ str_c("cust_", .)
+    )
 
+bike_orderlines_colnames_tbl %>%
+    select(
+        contains("cust_")
+        , total_price
+    )
 
 # 2.0 Feature Engineering with Text -----
 # Investigating "model" and extracting well-formatted features
-
+bikes_tbl %>%
+    
+    select(model) %>%
+    
+    # fix typo
+    mutate(model = case_when(
+        model == "CAAD Disc Ultegra" ~ "CAAD12 Disc Ultegra"
+        , TRUE ~ model
+    )) %>%
+    
+    # separate using the spaces
+    separate(
+        col      = model
+        , into   = str_c(
+            "model_", 1:7
+        )
+        , sep    = " "
+        , remove = F
+        , fill   = "right"
+        , extra  = "drop"
+    ) 
+    
+    view()
