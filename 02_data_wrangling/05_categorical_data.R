@@ -77,14 +77,29 @@ plot_sales(sales_by_cat_2_tbl)
 # 3.1 Inspecting Factors ----
 
 # Vector
+sales_by_cat_2_tbl %>%
+    pull(category_2) %>%
+    levels()
 
+sales_by_cat_2_tbl %>%
+    pull(category_2) %>%
+    as.numeric()
 
 # Tibble
-
+sales_by_cat_2_tbl %>%
+    mutate(
+        label = category_2 %>% as.character()
+        , value = category_2 %>% as.numeric()
+    )
 
 
 # 3.2 Creating Factors: as_factor() vs as.factor() ----
-
+sales_by_cat_2_tbl %>%
+    mutate(
+        category_2 = as.character(category_2)
+        , category_2_as_fct = as_factor(category_2) %>% as.numeric()
+        , category_2_as.fct = as.factor(category_2) %>% as.numeric()
+    )
 
 
 
