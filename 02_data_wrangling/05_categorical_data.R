@@ -118,8 +118,29 @@ sales_by_cat_2_tbl %>%
 
 
 # 3.4 Time-Based Reordering: fct_reorder2() ----
+sales_by_cat2_q_tbl <- bike_orderlines_tbl %>%
+    select(order_date, category_2, total_price) %>%
+    # mutate(order_date_qtr = quarter(order_date, with_year = T)) %>%
+    mutate(order_date = order_date %>% floor_date("quarter") %>% ymd()) %>%
+    group_by(category_2, order_date) %>%
+    summarize(sales = sum(total_price)) %>%
+    ungroup()
 
-
+sales_by_cat2_q_tbl %>%
+    mutate(category_2 = category_2 %>% fct_reorder2(order_date, sales)) %>%
+    ggplot(
+        mapping = aes(
+            x = order_date
+            , y = sales
+            , color = category_2
+        )
+    ) +
+    geom_point() +
+    geom_line() +
+    facet_wrap(~ category_2) +
+    scale_y_continuous(labels = scales::dollar) +
+    theme_tq() +
+    scale_color_tq()
 
 
 
