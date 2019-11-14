@@ -144,8 +144,27 @@ sales_by_cat2_q_tbl %>%
 
 
 
-# 3.5 Creating "Other" Category - fct_lump() & fct_shift() ----
-
+# 3.5 Creating "Other" Category - fct_lump() & fct_relevel() ----
+sales_by_cat_2_tbl %>%
+    mutate(
+        category_2 = category_2 %>% 
+            fct_lump(
+                n = 6, 
+                w = sales, 
+                other_level = "All Other Bike Categories"
+                )
+        ) %>%
+    group_by(category_2) %>%
+    summarise(sales = sum(sales)) %>%
+    mutate(
+        category_2 = category_2 %>% 
+            fct_relevel(
+                "All Other Bike Categories", 
+                after = 0
+                )
+        ) %>%
+    plot_sales()
+    
 
 
 
