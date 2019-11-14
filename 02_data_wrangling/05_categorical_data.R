@@ -105,7 +105,14 @@ sales_by_cat_2_tbl %>%
 
 
 # 3.3 Reording Factors: fct_reorder() and fct_rev() ----
-
+sales_by_cat_2_tbl %>% 
+    arrange(desc(sales)) %>%
+    mutate(sales_negative = -sales) %>%
+    mutate(
+        category_2 = category_2 %>% fct_reorder(sales_negative) %>% fct_rev(),
+        values = category_2 %>% as.numeric()
+    ) %>%
+    plot_sales()
 
 
 
