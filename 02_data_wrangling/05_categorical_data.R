@@ -138,7 +138,7 @@ sales_by_cat2_q_tbl %>%
     geom_point() +
     geom_line() +
     facet_wrap(~ category_2) +
-    scale_y_continuous(labels = scales::dollar) +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6, suffix = "M")) +
     theme_tq() +
     scale_color_tq()
 
