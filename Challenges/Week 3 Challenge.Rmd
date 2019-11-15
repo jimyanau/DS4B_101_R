@@ -195,7 +195,10 @@ bike_orderlines_tbl %>%
         max_price = max(price) %>% scales::dollar()
     ) %>%
     ungroup() %>%
-    set_names("Category 1", "Category 2", "Model Base", "Mean Price", "Min Price", "Max Price")
+    arrange(desc(mean_price)) %>%
+    #set_names("Category 1", "Category 2", "Model Base", "Mean Price", "Min Price", "Max Price")
+    # functional method
+    set_names(names(.) %>% str_replace("_", " ") %>% str_to_title())
  
 ```
 
