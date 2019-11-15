@@ -28,7 +28,7 @@ This is a short challenge to begin applying what you are learning to the problem
 # Objectives
 
 1. Apply `lubridate` and `stringr` functions to answer questions related to the course projects. 
-
+ 
 2. Gain exposure to `rmarkdown`.
 
 # Data
@@ -74,7 +74,15 @@ glimpse(bike_orderlines_tbl)
 _What does this tell us about a time of year to focus marketing efforts?_
 
 ```{r}
-
+bike_orderlines_tbl %>%
+    select(order_date, total_price) %>%
+    mutate(month = month(order_date, label = T, abbr = F)) %>%
+    group_by(month) %>%
+    summarize(sales = sum(total_price)) %>%
+    ungroup() %>%
+    arrange(month) %>%
+    mutate(sales = sales %>% scales::dollar()) %>%
+    set_names("Month","Sales")
 
 
 ```
@@ -93,7 +101,13 @@ _What does this tell us about a time of year to focus marketing efforts?_
 Evaluate "Black Inc". _What does this tell us about the "Black Inc" feature?_
 
 ```{r}
-
+bike_orderlines_tbl %>%
+    select(model, total_price) %>%
+    mutate(black_inc = model %>% str_to_lower() %>% str_detect(pattern = "black inc")) %>%
+    group_by(black_inc) %>%
+    summarize(median_sales = median(total_price) %>% scales::dollar()) %>%
+    ungroup() %>%
+    set_names("Black Inc.", "Median Sales")
     
     
 ```
@@ -101,7 +115,13 @@ Evaluate "Black Inc". _What does this tell us about the "Black Inc" feature?_
 Evaluate "Ultegra". _What does this tell us about the "Ultegra" feature?_
 
 ```{r}
-
+bike_orderlines_tbl %>%
+    select(model, total_price) %>%
+    mutate(ultegra_flag = model %>% str_to_lower() %>% str_detect(pattern = "ultegra")) %>%
+    group_by(ultegra_flag) %>%
+    summarize(median_sales = median(total_price) %>% scales::dollar()) %>%
+    ungroup() %>%
+    set_names("Ultegra", "Median Sales")
     
     
 ```
@@ -110,7 +130,13 @@ Evaluate "Ultegra". _What does this tell us about the "Ultegra" feature?_
 Evaluate "Disc" option. _What does this tell us about the "Disc" feature?_
 
 ```{r}
-
+bike_orderlines_tbl %>%
+    select(model, total_price) %>%
+    mutate(disc_flag = model %>% str_to_lower() %>% str_detect(pattern = "disc")) %>%
+    group_by(disc_flag) %>%
+    summarize(median_sales = median(total_price) %>% scales::dollar()) %>%
+    ungroup() %>%
+    set_names("Disc", "Median Sales")
 
 ```
 
@@ -131,7 +157,45 @@ Evaluate "Disc" option. _What does this tell us about the "Disc" feature?_
 _What does this tell us about how bikes are priced?_
 
 ```{r}
-
+bike_orderlines_tbl %>%
+    select(category_1, category_2, model, price) %>%
+    distinct() %>%
+    separate(
+        col = model
+        , into = str_c(
+            "model_", 1:7
+        )
+        , sep = " "
+        , remove = F
+        , fill = "right"
+        , extra = "drop"
+    ) %>%
+    mutate(
+        model_base = case_when(
+            #Supersix
+            str_detect(str_to_lower(model_1), "supersix") ~ str_c(model_1, model_2, sep = " "),
+            # Beast of the East
+            str_detect(str_to_lower(model_1), "beast") ~ str_c(model_1, model_2, model_3, model_4, sep = " "),
+            # Fat CAAD
+            str_detect(str_to_lower(model_1), "fat") ~ str_c(model_1, model_2, sep = " "),
+            # bad habit
+            str_detect(str_to_lower(model_1), "bad") ~ str_c(model_1, model_2, sep = " "),
+            # scalpel 29
+            str_detect(str_to_lower(model_1), "scalpel") ~ str_c(model_1, model_2, sep = " "),
+            # catch all
+            TRUE ~ model_1
+        )
+    ) %>%
+    select(-matches("model_[0-9]")) %>%
+    #select(category_1, category_2, model_base, price) %>%
+    group_by(category_1, category_2, model_base) %>%
+    summarize(
+        mean_price = mean(price) %>% scales::dollar(),
+        min_price  = min(price) %>% scales::dollar(),
+        max_price = max(price) %>% scales::dollar()
+    ) %>%
+    ungroup() %>%
+    set_names("Category 1", "Category 2", "Model Base", "Mean Price", "Min Price", "Max Price")
  
 ```
 
