@@ -18,10 +18,25 @@ glimpse(bike_orderlines_tbl)
 # Goal: Explain relationship between order value and quantity of bikes sold
 
 # Data Manipulation
-
+order_value_tbl <- bike_orderlines_tbl %>%
+    select(order_id, order_line, total_price, quantity) %>%
+    group_by(order_id) %>%
+    summarize(
+        total_quantity = sum(quantity)
+        , total_price = sum(total_price)
+    ) %>%
+    ungroup()
 
 # Scatter Plot
-
+order_value_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = total_quantity
+            , y = total_price
+        )
+    ) +
+    geom_point(alpha = 0.312, position = "jitter", size = 2) +
+    geom_smooth(method = "lm", se = F)
 
 
 
