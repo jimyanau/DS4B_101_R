@@ -46,10 +46,23 @@ order_value_tbl %>%
 # Goal: Describe revenue by Month, expose cyclic nature
 
 # Data Manipulation
-
+revenue_by_month_tbl <- bike_orderlines_tbl %>%
+    select(order_date, total_price) %>%
+    mutate(year_month = floor_date(order_date, "months") %>% ymd()) %>%
+    group_by(year_month) %>%
+    summarize(revenue = sum(total_price)) %>%
+    ungroup()
 
 # Line Plot
-
+revenue_by_month_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year_month
+            , y = revenue
+        )
+    ) +
+    geom_line() +
+    geom_smooth(span = 0.2)
 
 
 
