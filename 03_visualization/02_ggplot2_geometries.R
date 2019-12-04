@@ -177,6 +177,7 @@ unit_price_by_cat2_tbl %>%
         )
     ) +
     geom_violin() +
+    geom_jitter(width = 0.2, color = "#2c3e50") +
     coord_flip() +
     tidyquant::theme_tq()
 
