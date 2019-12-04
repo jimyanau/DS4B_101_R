@@ -72,10 +72,24 @@ revenue_by_month_tbl %>%
 # Goal: Sales by Descriptive Category
 
 # Data Manipulation
-
+revenue_by_category_2_tbl <- bike_orderlines_tbl %>% 
+    select(category_2, total_price) %>%
+    group_by(category_2) %>%
+    summarise(revenue = sum(total_price)) %>%
+    ungroup()
 
 # Bar Plot
-
+revenue_by_category_2_tbl %>%
+    mutate(category_2 = category_2 %>% as_factor() %>% fct_reorder(revenue)) %>%
+    ggplot(
+        mapping = aes(
+            x = category_2
+            , y = revenue
+        )
+    ) +
+    geom_col() +
+    coord_flip()
+    
 
 
 
