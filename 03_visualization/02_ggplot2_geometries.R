@@ -87,28 +87,61 @@ revenue_by_category_2_tbl %>%
             , y = revenue
         )
     ) +
-    geom_col() +
+    geom_col(
+        fill = "#2c3d50"
+    ) +
     coord_flip()
     
 
-
-
-
-
 # 4.0 Histogram / Density Plots ----
 # - Great for inspecting the distribution of a variable
-
+bike_orderlines_tbl %>%
+    distinct(model, price) %>%
+    ggplot(
+        mapping = aes(
+            x = price
+        )
+    ) +
+    geom_histogram(
+        bins = 25
+        , fill = "blue"
+        , color = "white"
+    ) + 
+    tidyquant::theme_tq()
 
 # Goal: Unit price of bicycles
 # Histogram
-
+bike_orderlines_tbl %>%
+    distinct(price, model, frame_material) %>%
+    ggplot(
+        mapping = aes(
+            x = price
+            , fill = frame_material
+        )
+    ) +
+    geom_histogram() +
+    facet_wrap(~ frame_material, ncol = 1) +
+    tidyquant::theme_tq() +
+    tidyquant::scale_fill_tq()
 
 # Goal: Unit price of bicylce, segmenting by frame material
 # Histogram
 
 
 # Density
-
+bike_orderlines_tbl %>%
+    distinct(price, model, frame_material) %>%
+    ggplot(
+        mapping = aes(
+            x = price
+            , fill = frame_material
+        )
+    ) +
+    geom_density(
+        alpha = 0.618
+    ) +
+    tidyquant::scale_fill_tq() +
+    tidyquant::theme_tq()
 
 
 
