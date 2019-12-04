@@ -191,14 +191,36 @@ unit_price_by_cat2_tbl %>%
 # Goal: Exposing sales over time, highlighting outlier
 
 # Data Manipulation
-
+revenue_by_year_tbl <- bike_orderlines_tbl %>%
+    select(order_date, total_price) %>%
+    mutate(order_year = year(order_date)) %>%
+    group_by(order_year) %>%
+    summarise(revenue = sum(total_price)) %>%
+    ungroup()
 
 # Adding text to bar chart
-
-
 # Filtering labels to highlight a point
-
-
-
-
-
+revenue_by_year_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = order_year
+            , y = revenue
+        )
+    ) +
+    geom_col(fill = "#2c3e50") +
+    geom_text(
+        mapping = aes(
+            label = scales::dollar(revenue, scale = 1e-6, suffix = "M")
+        )
+        , vjust = 1.5
+        , color = "white"
+    ) +
+    geom_label(
+        label = "Major Demand This Year"
+        , vjust = -0.5
+        , size = 5
+        , data = revenue_by_year_tbl %>% filter(order_year == 2013) 
+    ) +
+    expand_limits(y = 2e7) +
+    theme_tq()
+ 
