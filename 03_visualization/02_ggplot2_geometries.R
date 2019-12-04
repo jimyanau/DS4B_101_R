@@ -152,13 +152,33 @@ bike_orderlines_tbl %>%
 # Goal: Unit price of models, segmenting by category 2
 
 # Data Manipulation
-
+unit_price_by_cat2_tbl <- bike_orderlines_tbl %>%
+    distinct(category_2, model, price) %>%
+    mutate(category_2 = category_2 %>% as_factor() %>% fct_reorder(price))
 
 # Box Plot
-
+unit_price_by_cat2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = category_2
+            , y = price
+        )
+    ) +
+    geom_boxplot() +
+    coord_flip() +
+    tidyquant::theme_tq()
 
 # Violin Plot & Jitter Plot
-
+unit_price_by_cat2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = category_2
+            , y = price
+        )
+    ) +
+    geom_violin() +
+    coord_flip() +
+    tidyquant::theme_tq()
 
 
 
