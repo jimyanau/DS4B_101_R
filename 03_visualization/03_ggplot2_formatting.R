@@ -27,31 +27,37 @@ sales_by_year_category_2_tbl <- bike_orderlines_tbl %>%
 
 sales_by_year_category_2_tbl
 
+sales_by_year_category_2_tbl %>%
+    mutate(category_2_num = as.numeric(category_2)) %>%
+    arrange(category_2_num)
 
 
 # 1.0 Working with Colors ----
-
 # 1.1 Color Conversion ----
-
 # Named Colors
-
+colors()
 
 # To RGB
+col2rgb("slateblue")
 
+col2rgb("#2c3e50")
 
 # To HEX
- 
+rgb(106,90,205, maxColorValue = 255) 
 
 # 1.2 Color Palettes ----
 
 # tidyquant
+tidyquant::palette_light()
 
+palette_light()[1] %>% col2rgb()
 
 # Brewer
-
+RColorBrewer::display.brewer.all()
+RColorBrewer::brewer.pal(n = 100, name = "Blues") %>% col2rgb()
 
 # Viridis
-
+viridisLite::viridis(n = 20)
 
 
 
