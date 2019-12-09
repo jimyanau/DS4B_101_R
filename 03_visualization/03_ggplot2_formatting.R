@@ -172,9 +172,15 @@ sales_by_year_category_2_tbl %>%
     
 
 # Stacked Area
-
-
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , fill = category_2
+        )
+    ) +
+    geom_area(color = "black")
 
 # 5.0 Scales (Colors, Fills, Axis) ----
 
