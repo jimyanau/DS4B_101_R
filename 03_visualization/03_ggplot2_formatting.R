@@ -154,7 +154,22 @@ sales_by_year_category_2_tbl %>%
 # 4.0 Position Adjustments (Stack & Dodge) ----
 
 # Stacked Bars & Side-By-Side Bars
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , fill = category_2
+        )
+    ) +
+    geom_col(
+        #position = "dodge" # default is "stack"
+        position = position_dodge(
+            width =   0.9
+        )
+        , color = "white"
+    ) 
+    
 
 # Stacked Area
 
