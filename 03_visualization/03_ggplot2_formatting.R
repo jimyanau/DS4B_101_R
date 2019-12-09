@@ -65,22 +65,55 @@ viridisLite::viridis(n = 20)
 
 # 2.1 Color  -----
 # - Used with line and points, Outlines of rectangular objects
-
-
-# Usine colors as aesthetics
-
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , color = category_2 # global
+        )
+    ) +
+    geom_line() + # can define color here as local
+    geom_point()
 
 
 # 2.2 Fill  -----
 # - Used with fill of rectangular objects 
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , fill = category_2
+        )
+    ) +
+    geom_col() +
+    scale_y_continuous(
+        labels = scales::dollar_format(scale = 1/1e6, suffix = "M")
+    )
 
 
 # 2.3 Size ----
 # - Used with points
 
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+        )
+    ) +
+    geom_line(
+        mapping = aes(
+            color = category_2
+            , size = 1
+        )
+    ) +
+    geom_point(
+        mapping = aes(
+            size = revenue
+        )
+    )
 
 
 
@@ -88,7 +121,33 @@ viridisLite::viridis(n = 20)
 # - Great way to tease out variation by category
 
 # Goal: Sales annual sales by category 2
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , color = category_2
+        )
+    ) +
+    geom_line(size = 1, color = "black") +
+    geom_point() +
+    geom_smooth(method = "lm", se = F) +
+    facet_wrap(~ category_2, scales = "free_y") +
+    scale_y_continuous(
+        labels = scales::dollar_format(
+            scale = 1/1e6
+            , suffix = "M"
+        )
+    ) +
+    expand_limits(
+        y = 0
+    ) +
+    labs(
+        title = "Sales by Category 2"
+        , color = "Category 2"
+        , x = ""
+        , y = "Revenue"
+    )
 
 
 
