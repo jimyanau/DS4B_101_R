@@ -296,7 +296,23 @@ g_facet_continuous +
 
 
 # 7.0 Themes  ----
-
+g_facet_continuous +
+    theme_light() +
+    theme(
+        axis.text.x = element_text(
+            angle   = 45
+            , hjust = 1
+            )
+        , strip.background = element_rect(
+            color  = "black"
+            , fill = "cornflowerblue"
+            , size = 1
+        )
+        , strip.text = element_text(
+            face = "bold"
+            , color = "white"
+        )
+    )
 
 
 
