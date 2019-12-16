@@ -172,7 +172,7 @@ sales_by_year_category_2_tbl %>%
     
 
 # Stacked Area
-sales_by_year_category_2_tbl %>%
+g_area_discrete <- sales_by_year_category_2_tbl %>%
     ggplot(
         mapping = aes(
             x = year
@@ -182,6 +182,8 @@ sales_by_year_category_2_tbl %>%
     ) +
     geom_area(color = "black")
 
+g_area_discrete
+
 # 5.0 Scales (Colors, Fills, Axis) ----
 
 # 5.1 Plot Starting Points ----
@@ -189,30 +191,73 @@ sales_by_year_category_2_tbl %>%
 # - Categorical (e.g. ): Changes color via discrete palette
 
 # Plot 1: Faceted Plot, Color = Continuous Scale
+g_facet_continuous <- sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , color = revenue
+        )
+    ) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_wrap(~ category_2, scales = "free_y") +
+    expand_limits(y = 0) +
+    theme_minimal()
 
+g_facet_continuous
 
 # Plot 2: Faceted Plot, Color = Discrete Scale
+g_facet_discrete <- sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , color = category_2
+        )
+    ) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_wrap(~ category_2, scales = "free_y") +
+    expand_limits(y = 0) +
+    theme_minimal()
 
+g_facet_discrete
 
 # Plot 3: Stacked Area Plot
+g_area_discrete <- sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , fill = category_2 
+        )
+    ) +
+    geom_area(color = "black") +
+    theme_minimal()
 
-
-
+g_area_discrete
 
 # 5.2 Scale Colors & Fills ----
 # - Awesome way to show variation by groups (discrete) and by values (continuous)
 
 # Color by Revenue (Continuous Scale)
-
-
+g_facet_continuous +
+    # scale_color_continuous(
+    #     low = "cornflowerblue"
+    #     , high = "red"
+    # )
+    scale_color_viridis_c()
 
 
 # Color by Category 2 (Discrete Scale)
-
+g_facet_discrete +
+    scale_color_viridis_d()
 
 
 # Fill by Category 2
-
+g_area_discrete +
+    scale_fill_brewer(palette = "Set3")
  
 
 
