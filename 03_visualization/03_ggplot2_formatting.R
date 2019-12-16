@@ -317,7 +317,32 @@ g_facet_continuous +
 
 
 # 8.0 Putting It All Together ----
-
+sales_by_year_category_2_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = year
+            , y = revenue
+            , fill = category_2
+        )
+    ) +
+    geom_area(color = "black") +
+    scale_fill_brewer(palette = "Blues", direction = -1) +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6, suffix = "M")) +
+    labs(
+        title = "Sales Over Year by Category 2"
+        , subtitle = "Sales trending upward"
+        , caption = "Data comes from our ERP database"
+        , x = ""
+        , y = "Revenue ($M)"
+        , fill = "Category 2"
+    ) +
+    theme_light() +
+    theme(
+        title = element_text(
+            face = "bold"
+            , color = "#08306B"
+        )
+    )
 
 
 
