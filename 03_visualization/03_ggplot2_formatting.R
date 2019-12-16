@@ -258,17 +258,40 @@ g_facet_discrete +
 # Fill by Category 2
 g_area_discrete +
     scale_fill_brewer(palette = "Set3")
+g_area_discrete +
+    scale_fill_tq()
  
 
 
 # 5.3 Axis Scales ----
-
-
-
-
-
+g_facet_continuous +
+    scale_x_continuous(
+        breaks = seq(2011,2015, by = 2)
+    ) +
+    scale_y_continuous(
+        labels = scales::dollar_format(scale = 1e-6, suffix = "M")
+    )
+    
 # 6.0 Labels ----
-
+g_facet_continuous +
+    scale_x_continuous(
+        breaks = seq(2011,2015, by = 2)
+    ) +
+    scale_y_continuous(
+        labels = scales::dollar_format(scale = 1e-6, suffix = "M")
+    ) +
+    geom_smooth(
+        method = "lm"
+        , se = FALSE
+    ) +
+    theme_dark() +
+    labs(
+        title = "Bike Sales"
+        , subtitle = "Positive trending sales"
+        , caption = "5-year sales trends comes from our ERP database"
+        , x = ""
+        , y = ""
+    )
 
 
 
