@@ -2,7 +2,7 @@
 # FUNCTIONAL PROGRAMMING ----
 
 
-install.packages("ggrepel") # ggrepel needed for text and label repel in plots
+if(!require(ggrepel)) install.packages("ggrepel") # ggrepel needed for text and label repel in plots
 
 library(tidyverse)
 library(lubridate)
@@ -38,8 +38,9 @@ mean_remove_na <- function(x, na.rm = TRUE, ...) {
     return(avg)
 }
 
-
-
+mean(x)
+mean_remove_na(x)
+mean_remove_na(x, trim = 0.1)
 
 
 
@@ -49,43 +50,157 @@ mean_remove_na <- function(x, na.rm = TRUE, ...) {
 
 # Calculating a 3 month rolling average  for category_1 & category_2 
 # with dates aligned at last day of the month
+rolling_avg_3_tbl <- bike_orderlines_tbl %>%
+    select(order_date, category_1, category_2, total_price) %>%
+    mutate(order_date = ymd(order_date)) %>%
+    mutate(month_end = ceiling_date(order_date, unit = "month") - period(1, units = "day")) %>%
+    group_by(category_1, category_2, month_end) %>%
+    summarise(total_price = sum(total_price)) %>%
+    mutate(rolling_avg_3 = rollmean(total_price, k = 3, na.pad = TRUE, align = "right")) %>%
+    ungroup() %>%
+    mutate(category_2 = as_factor(category_2) %>% fct_reorder2(month_end, total_price))
 
-
+rolling_avg_3_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = month_end
+            , y = total_price
+            , color = category_2
+        )
+    ) +
+    geom_point() +
+    geom_line(mapping = aes(y = rolling_avg_3), color = "blue", size = 1) +
+    facet_wrap(~ category_2, scales = "free_y") +
+    theme_tq() +
+    scale_color_tq()
 
 
 # 2.1 Vector Functions ----
-
+?ymd
+?ceeiling_date
+?sum
+?rollmean
 
 # 2.2 Data Functions ----
+?sleect
+?mutate
+?group_by
+?ggplot
 
 
 # 3.0 CONTROLLING FLOW: IF STATEMENTS, MESSAGES, WARNINGS, STOP ----
-
+class_detect <- function(x){
+    if (is.numeric(x)) {
+        message("Value is numeric")
+        print(x)
+    } else if (is.character(x)) {
+        warning("In class_detect(): Value is character, should be numeric, but can be accepted.", call. = FALSE)
+        print(x)
+    } else if (is.logical(x)) {
+        stop("In class_detect: logical value was provided. Should be numeric.", call. = FALSE)
+        print(x)
+    } else {
+        message("Unknown class")
+        print(x)
+    }
+}
+1 %>% class_detect()
+"a" %>% class_detect()
+TRUE %>% class_detect()
+formula(y ~ x) %>% class_detect()
 
 # 4.0 VECTORIZED REMOVE OUTLIERS FUNCTION ----
 #  - Box Plot Diagram to Identify Outliers
 #  - Goal: Use box plot approach to identify outliers
 
 # Make bikes_tbl
+bikes_tbl <- bike_orderlines_tbl %>%
+    distinct(model, category_1, price)
 
-
+bikes_tbl
 
 # Visualize Box Plot
-
+bikes_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = category_1
+            , y = price
+        )
+    ) +
+    geom_boxplot()
 
 
 # Create remove_outliers()
+x <- c(0:10, 50, NA_real_)
+x
 
+detect_outliers <- function(x) {
+    
+    # Body ----
+    if(missing(x)) stop("No data supplied, x needs a vector of values", call. = FALSE)
+    if(!is.numeric(x)) stop("x must be numeric", call. = FALSE)
+    
+    data_tbl <- tibble(data = x)
+    
+    limits_tbl <- data_tbl %>%
+        summarise(
+            q_low = quantile(data, probs = 0.25, na.rm = TRUE)
+            , q_high = quantile(data, probs = 0.75, na.rm = TRUE)
+            , iqr = IQR(data, na.rm = TRUE)
+            , ll = q_low - 1.5  * iqr
+            , ul = q_high + 1.5 * iqr
+        )
+    
+    output_tbl <- data_tbl %>%
+        mutate(
+            outlier = case_when(
+                data < limits_tbl$ll ~ TRUE
+                , data > limits_tbl$ul ~ TRUE
+                , TRUE ~ FALSE
+            )
+        )
+    
+    return(output_tbl$outlier)
+}
+detect_outliers(x)
+detect_outliers()
+detect_outliers("a")
 
+tibble(x = x) %>% 
+    mutate(outlier = detect_outliers(x))
 
 # Apply remove_outliers() to bikes_tbl
-
+bike_outliers_tbl <- bikes_tbl %>%
+    group_by(category_1) %>%
+    mutate(outlier = detect_outliers(price)) %>%
+    ungroup()
 
 
 # Visualize with remove_outlers()
-
-
-
+bike_outliers_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = category_1
+            , y = price
+        )
+    ) +
+    geom_boxplot() +
+    geom_label_repel(
+        data = . %>% filter(outlier)
+        , mapping = aes(
+            label = model
+            , color = "red"
+            , size = 3
+        )
+    ) +
+    theme_tq() +
+    theme(
+        legend.position = "none"
+    ) +
+    labs(
+        x = ""
+        , y = ""
+    )
 
 
 # 5.0 DATA FUNCTION: FEATURE ENGINEERING ----
