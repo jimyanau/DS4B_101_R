@@ -347,15 +347,36 @@ bikes_tbl %>%
 # 6.0 SAVING AND SOURCING FUNCTIONS ----
 
 # 6.1 Create folder and file ----
+#fs::dir_create("00_scripts/")
 
-
+path <- "00_scripts/separate_bikes_and_outier_detection.R"
+fs::file_create(path = path)
 
 # 6.2 Build and add header ----
+file_header_text <- str_glue(
+"
+# separate bike models and outlier detection functions ----
 
 
+# separate_bike_models_function(): A tidy function to separate the model column into engineering features
+
+
+# detect_outerliers(): a vectorized function tbat detects outliers using T/F
+
+
+# Libraries ----
+library(tidyverse)
+"
+)
+
+write_lines(file_header_text, path = path)
 
 # 6.3 Add functions with dump() ----
-
+c("separate_bike_model", "detect_outliers") %>%
+    dump(
+        file = "00_scripts/separate_bikes_and_outier_detection.R"
+        , append = FALSE
+    )
 
 
 # 6.4 Source function ----
