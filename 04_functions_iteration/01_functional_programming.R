@@ -380,3 +380,6 @@ c("separate_bike_model", "detect_outliers") %>%
 
 
 # 6.4 Source function ----
+rm("separate_bike_model")
+rm("detect_outliers")
+source("00_scripts/separate_bikes_and_outier_detection.R")
