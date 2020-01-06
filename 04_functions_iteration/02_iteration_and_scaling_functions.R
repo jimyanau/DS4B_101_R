@@ -15,29 +15,63 @@ glimpse(bike_orderlines_tbl)
 
 # 1.0 PRIMER ON PURRR ----
 # Programmatically getting Excel files into R
+excel_paths_tbl <- fs::dir_info("00_data/bike_sales/data_raw/")
 
-
+paths_chr <- excel_paths_tbl %>%
+    pull(path)
 
 # What Not To Do: Don't use for loops
-
+excel_list <- list()
+for (path in paths_chr) {
+    print(path)
+    excel_list[[path]] <- read_excel(path = path)
+}
 
 # What to Do: Use map()
+?map
 
+# Method 1
+excel_list2 <- paths_chr %>%
+    map(.f = read_excel) %>%
+    set_names(paths_chr)
 
+# Method 2 w anonymous func
+paths_chr %>%
+    map(~ read_excel(.)) %>%
+    set_names(paths_chr)
 
-
+# Method 3 using secified func
+paths_chr %>%
+    map(function(x) read_excel(path = x)) %>%
+    set_names(paths_chr)
 
 # Reading Excel Sheets
-
+excel_sheets("00_data/bike_sales/data_raw/bikes.xlsx") %>%
+    map(~ read_excel(path = "00_data/bike_sales/data_raw/bikes.xlsx", sheet = .))
 
 
 
 # 2.0 MAPPING DATA FRAMES ----
 
 # 2.1 Column-wise Map ----
+bike_orderlines_tbl %>% is.list()
 
+bike_orderlines_tbl %>%
+    map(~ class(.)[1])
 
+# Char vector
+bike_orderlines_tbl %>%
+    map_chr(~ class(.)[1])
 
+# data frame
+bike_orderlines_tbl %>%
+    map_df(~ class(.)[1]) %>%
+    #glimpse()
+    gather()
+
+bike_orderlines_tbl %>%
+    map_df(~ sum(is.na(.)) / length(.)) %>%
+    gather()
 
 # 2.2 Map Variants ----
 
@@ -46,9 +80,14 @@ glimpse(bike_orderlines_tbl)
 
 
 # 2.3 Row-wise Map ----
+excel_tbl <- excel_paths_tbl %>%
+    select(path) %>%
+    mutate(data = path %>% map(read_excel))
 
-
-
+# good format
+excel_list
+# best format
+excel_tbl
 
 
 # 3.0 NESTED DATA ----
