@@ -75,10 +75,6 @@ bike_orderlines_tbl %>%
 
 # 2.2 Map Variants ----
 
-
-
-
-
 # 2.3 Row-wise Map ----
 excel_tbl <- excel_paths_tbl %>%
     select(path) %>%
@@ -93,14 +89,25 @@ excel_tbl
 # 3.0 NESTED DATA ----
 
 # Unnest
+excel_tbl$data
 
+excel_tbl$data[[3]]
+
+excel_tbl_unnested <- excel_tbl %>%
+    unnest(cols = c(data))
+
+excel_tbl_unnested
 
 # Nest
+excel_tbl_nested <- excel_tbl_unnested %>%
+    group_by(path) %>%
+    nest()
 
-
+excel_tbl_nested
 
 # Mapping Nested List Columns
-
+excel_tbl_nested$data[[1]] %>%
+    select_if(~ !is.na(.) %>% all())
 
 
 
