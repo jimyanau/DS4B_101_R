@@ -109,17 +109,23 @@ excel_tbl_nested
 excel_tbl_nested$data[[1]] %>%
     select_if(~ !is.na(.) %>% all())
 
+# Method 1: Creating a function outside of purrr::map()
+# Step 1: Create a function that can be mapped to one element
+select_non_na_columns <- function(data) {
+    
+    data %>%
+        select_if(~ !is.na(.) %>% all())
+    
+}
+# Step 2: extract an element and test function
+excel_tbl_nested$data[[1]] %>%
+    select_non_na_columns()
+# Step 3: use mutate() + map()
+excel_tbl_nested_fixed <- excel_tbl_nested %>%
+    mutate(data_fix = data %>% map(select_non_na_columns))
 
-
-
-
-
-
-
-
-
-
-
+# Step 4: check results
+excel_tbl_nested_fixed$data_fix[[1]]
 
 # 4.0 MODELING WITH PURRR ----
 
@@ -166,39 +172,117 @@ rolling_avg_3_tbl %>%
 # 4.2 Modeling Primer ----
 
 # Data Preparation
+sales_by_m_cross_country_tbl <- rolling_avg_3_tbl %>%
+    filter(category_2 == 'Cross Country Race') %>%
+    select(month_end, total_price) %>%
+    mutate(month_end_numeric = as.numeric(month_end))
 
-
+sales_by_m_cross_country_tbl %>%
+    ggplot(
+        mapping = aes(
+            x = month_end_numeric
+            , y = total_price
+        )
+    ) +
+    geom_point() +
+    geom_smooth(method = "loess", span = 0.2, se = FALSE)
 
 # Making a loess model
+fit_loess_cross_country <- sales_by_m_cross_country_tbl %>%
+    loess(total_price ~ month_end_numeric, data = ., span = 0.2)
 
-
+fit_loess_cross_country
 
 # Working With Broom
-
-
+fit_loess_cross_country %>%
+    broom::augment() %>%
     
+# Visualizing Results
+    ggplot(
+        mapping = aes(
+            x = month_end_numeric
+            , y = total_price
+        )
+    ) +
+    geom_point() +
+    geom_line(
+        mapping = aes(
+            y = .fitted
+        )
+        , color = "blue"
+    )
     
-# Visualizing results
-    
-
-
-
 
 # 4.3 Function To Return Fitted Results ----
+# Step 1: develop function to return fitted results
+rolling_avg_3_tbl_nested <- rolling_avg_3_tbl %>%
+    group_by(category_1, category_2) %>%
+    nest()
 
 
+data <- rolling_avg_3_tbl_nested$data[[1]]
 
+tidy_loess <- function(data, span = 0.2) {
+    
+    data_formatted <- data %>%
+        select(month_end, total_price) %>%
+        mutate(month_end_numeric = as.numeric(month_end))
+    
+    fit_loess <- loess(
+        formula = total_price ~ month_end_numeric
+        , data = data_formatted
+        , span = span
+    )
+    
+    output_tbl <- fit_loess %>%
+        broom::augment() %>%
+        select(.fitted)
+    
+    return(output_tbl)
+    
+}
 
 # 4.4 Test Function on Single Element ----
-
+rolling_avg_3_tbl_nested$data[[1]] %>%
+    tidy_loess()
 
 # 4.5 Map Function to All Categories ----
 
 # Map Functions
+loess_tbl_nested <- rolling_avg_3_tbl_nested %>%
+    mutate(fitted = data %>% map(tidy_loess))
 
+loess_tbl_nested$fitted[[1]]
 
+loess_tbl_nested %>%
+    unnest(cols = c(data, fitted))
 
 # Visualize Results
-
+loess_tbl_nested %>%
+    unnest(cols = c(data, fitted)) %>%
+    ggplot(
+        mapping = aes(
+            x = month_end
+            , y = total_price
+            , color = category_2
+        )
+    ) +
+    geom_point() +
+    geom_line(
+        mapping = aes(
+            y = .fitted
+        )
+        , color = "blue"
+        , size = 2
+    ) +
+    facet_wrap(~ category_2, scales = "free_y") +
+    theme_tq() +
+    theme(
+        legend.position = "none"
+    ) +
+    labs(
+        x = "Month End"
+        , y = "Total Price"
+    )
 
 
