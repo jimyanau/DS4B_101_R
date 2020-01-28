@@ -276,4 +276,10 @@ cluster_trends_tbl %>%
     arrange(desc(prop_of_total)) %>%
     mutate(cum_prop = cumsum(prop_of_total))
 
-
+get_cluster_trends <- function(cluster = 1) {
+    cluster_trends_tbl %>%
+        filter(.cluster == cluster) %>%
+        arrange(desc(prop_of_total)) %>%
+        mutate(cum_prop = cumsum(prop_of_total))
+}
+get_cluster_trends(cluster = 4)
