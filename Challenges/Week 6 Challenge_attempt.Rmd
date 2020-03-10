@@ -147,7 +147,7 @@ sp_500_daily_returns_tbl <- sp_500_prices_tbl %>%
     mutate(lag_1 = lag(adjusted, n = 1)) %>%
     ungroup() %>%
     filter(!is.na(lag_1)) %>%
-    mutate(adj_diff = adjusted - adjusted_lag_1) %>%
+    mutate(adj_diff = adjusted - lag_1) %>%
     mutate(pct_return = adj_diff / adjusted_lag_1) %>% 
     select(symbol, date, pct_return)
 # Output: sp_500_daily_returns_tbl
