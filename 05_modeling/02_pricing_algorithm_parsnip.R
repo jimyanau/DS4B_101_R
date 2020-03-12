@@ -26,7 +26,8 @@ pacman::p_load(
     "yardstick",
     
     # Plot Decision Trees
-    "rpart.plot"
+    "rpart.plot",
+    "ggrepel"
 )
 
 # Source Scripts
@@ -72,34 +73,130 @@ model_sales_tbl %>%
 
 
 # 2.0 TRAINING & TEST SETS ----
+bike_features_tbl <- bike_orderlines_tbl %>%
+    select(price, model, category_2, frame_material) %>%
+    distinct() %>%
+    mutate(id = row_number()) %>%
+    select(id, everything()) %>%
+    separate_bike_model(keep_model_column = TRUE, append = TRUE)
 
+set.seed(seed = 1113)
+split_obj <- rsample::initial_split(
+    data = bike_features_tbl,
+    prop = 0.80,
+    strata = "model_base"
+    )
 
+split_obj %>%
+    training()
 
+split_obj %>%
+    testing()
+
+train_tbl <- training(split_obj)
+test_tbl <- testing(split_obj)
 
 # 3.0 LINEAR METHODS ----
 ?linear_reg
+?set_engine
+?fit
 
 
 # 3.1 LINEAR REGRESSION - NO ENGINEERED FEATURES ----
 
 # 3.1.1 Model ----
+model_01_linear_lm_simple <- linear_reg(mode = "regression") %>%
+    set_engine(engine = "lm") %>%
+    fit(
+        formula = price ~ category_2 + frame_material,
+        data = train_tbl
+    )
 
-
+model_01_linear_lm_simple %>%
+    predict(
+        new_data = test_tbl
+    ) %>%
+    bind_cols(test_tbl %>% select(price)) %>%
+    # Yardstick
+    yardstick::metrics(
+        truth = price,
+        estimate = .pred
+    )
+    mutate(res = price - .pred) %>%
+    # MAE
+    summarize(
+        MAE = abs(res) %>% mean(na.rm = TRUE),
+        RMSE = sqrt(mean(res^2, na.rm = TRUE))
+    )
 
 # 3.1.2 Feature Importance ----
-
+model_01_linear_lm_simple$fit %>% 
+        tidy() %>%
+        arrange(p.value) %>%
+        mutate(term = as_factor(term) %>% fct_rev()) %>%
+        ggplot(
+            mapping = aes(
+                x = estimate,
+                y = term
+            )
+        ) +
+        geom_point() +
+        geom_label_repel(
+            mapping = aes(
+                label = scales::dollar(estimate, accuracy = 1)
+            )
+        ) +
+        labs(
+            title = "Linear Regression Feature Importance",
+            subtitle = "Model 01 Simple LM Model"
+        ) +
+        theme_tq()
 
 # 3.1.3 Function to Calculate Metrics ----
-
-
+calc_metrics <- function(model, new_data = test_tbl){
+    
+    model %>%
+        predict(new_data = new_data) %>%
+        bind_cols(new_data %>% select(price)) %>%
+        metrics(truth = price, estimate = .pred)
+}
+model_01_linear_lm_simple %>% calc_metrics()
 
 # 3.2 LINEAR REGRESSION - WITH ENGINEERED FEATURES ----
 
 # 3.2.1 Model ----
+train_tbl
 
+model_02_linear_lm_complex <- linear_reg(mode = "regression") %>%
+    set_engine(engine = "lm") %>%
+    fit(
+        data = train_tbl %>% select(-id, -model, -model_tier),
+        formula = price ~ .
+    )
+model_02_linear_lm_complex %>% calc_metrics(new_data = test_tbl)
 
 # 3.2.2 Feature importance ----
-
+model_02_linear_lm_complex$fit %>% 
+    tidy() %>%
+    arrange(p.value) %>%
+    mutate(term = as_factor(term) %>% fct_rev()) %>%
+    ggplot(
+        mapping = aes(
+            x = estimate,
+            y = term
+        )
+    ) +
+    geom_point() +
+    geom_label_repel(
+        mapping = aes(
+            label = scales::dollar(estimate, accuracy = 1)
+        )
+    ) +
+    labs(
+        title = "Linear Regression Feature Importance",
+        subtitle = "Model 02 Complex LM Model"
+    ) +
+    theme_tq()
 
 
 # 3.3 PENALIZED REGRESSION ----
@@ -108,12 +205,44 @@ model_sales_tbl %>%
 ?linear_reg
 ?glmnet::glmnet
 
+model_03_linear_glmnet <- linear_reg(
+    mode = "regression", 
+    penalty = 100, 
+    mixture = 0.2
+    ) %>%
+    set_engine(engine = "glmnet") %>%
+    fit(
+        data = train_tbl %>% select(-id, -model, -model_tier),
+        formula = price ~ .
+    )
 
-
+model_03_linear_glmnet %>% calc_metrics(new_data = test_tbl)
 
 # 3.3.2 Feature Importance ----
-
-
+model_03_linear_glmnet$fit %>%
+    tidy() %>%
+    filter(lambda >= 10, lambda < 11) %>%
+    arrange(desc(estimate)) %>%
+    mutate(term = as_factor(term) %>% fct_rev()) %>%
+    ggplot(
+        mapping = aes(
+            x = estimate,
+            y = term
+        )
+    ) +
+    geom_point() +
+    geom_label_repel(
+        mapping = aes(
+            label = scales::dollar(estimate, accuracy = 1)
+        )
+    ) +
+    scale_x_continuous(labels = scales::dollar) +
+    labs(
+        title = "Linear Regression Feature Importance",
+        subtitle = "Model 03 Complex GLMNET Model"
+    ) +
+    theme_tq()
+    
 
 
 # 4.0 TREE-BASED METHODS ----
