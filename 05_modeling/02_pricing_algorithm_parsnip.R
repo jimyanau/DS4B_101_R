@@ -335,11 +335,41 @@ model_05_rand_forest_ranger$fit %>%
 ?rand_forest()
 ?randomForest::randomForest
 
-
+set.seed(1234)
+model_06_rand_forest_randomForest <- rand_forest(
+        mode = "regression",
+        trees = 1000
+    ) %>%
+    set_engine(
+        engine = "randomForest"
+    ) %>%
+    fit(
+        formula = price ~ .,
+        data = train_tbl %>% select(-id, -model, -model_tier)
+    )
+model_06_rand_forest_randomForest %>%
+    calc_metrics(new_data = test_tbl)
 
 # 4.2.4 randomForest: Feature Importance ----
-
-
+model_06_rand_forest_randomForest$fit %>%
+    randomForest::importance() %>%
+    as_tibble(
+        rownames = "name"
+    ) %>%
+    arrange(desc(IncNodePurity)) %>%
+    mutate(name = as_factor(name) %>% fct_rev()) %>%
+    ggplot(
+        mapping = aes(
+            x = IncNodePurity,
+            y = name
+        )
+    ) +
+    geom_point() +
+    labs(
+        title = "randomForest: Variable Importance",
+        subtitle = "Model 06: randomForest Random Forest"
+    ) +
+    theme_tq()
 
 
 # 4.3 XGBOOST ----
