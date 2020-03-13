@@ -19,7 +19,7 @@ pacman::p_load(
     "parsnip",
     
     # Preprocessing and Sampling
-    "recipies",
+    "recipes",
     "rsample",
     
     # Model Error Metrics
@@ -122,12 +122,12 @@ model_01_linear_lm_simple %>%
         truth = price,
         estimate = .pred
     )
-    mutate(res = price - .pred) %>%
-    # MAE
-    summarize(
-        MAE = abs(res) %>% mean(na.rm = TRUE),
-        RMSE = sqrt(mean(res^2, na.rm = TRUE))
-    )
+    # mutate(res = price - .pred) %>%
+    # # MAE
+    # summarize(
+    #     MAE = abs(res) %>% mean(na.rm = TRUE),
+    #     RMSE = sqrt(mean(res^2, na.rm = TRUE))
+    # )
 
 # 3.1.2 Feature Importance ----
 model_01_linear_lm_simple$fit %>% 
@@ -253,12 +253,34 @@ model_03_linear_glmnet$fit %>%
 ?decision_tree
 ?rpart::rpart
 
+model_04_tree_decision_tree <- decision_tree(
+    mode = "regression",
+    cost_complexity = 0.1,
+    tree_depth = 5,
+    min_n = 10
+) %>%
+    set_engine(
+        engine = "rpart"
+    ) %>%
+    fit(
+        formula = price ~ .,
+        data = train_tbl %>% select(-id, -model, -model_tier)
+    )
 
+model_04_tree_decision_tree %>%
+    calc_metrics(new_data = test_tbl)
 
 # 4.1.2 Decision Tree Plot ----
-
-
-
+model_04_tree_decision_tree$fit %>%
+    rpart.plot(
+        roundint = FALSE,
+        type = 1,
+        extra = 101,
+        fallen.leaves = FALSE,
+        cex = 0.8,
+        main = "Model 04 Decision Tree",
+        box.palette = "Grays"
+    )
 
 
 
@@ -269,10 +291,43 @@ model_03_linear_glmnet$fit %>%
 ?rand_forest()
 ?ranger::ranger
 
+model_05_rand_forest_ranger <- rand_forest(
+    mode = "regression",
+    mtry = 8,
+    trees = 5000
+    ) %>%
+    set_engine(
+        engine = "ranger",
+        importance = "impurity"
+    ) %>%
+    fit(
+        formula = price ~ ., 
+        data = train_tbl %>% select(-id, -model, -model_tier)
+    )
 
+model_05_rand_forest_ranger %>% 
+    calc_metrics(new_data = test_tbl)
 
 # 4.2.2 ranger: Feature Importance ----
-
+model_05_rand_forest_ranger$fit %>%
+    ranger::importance() %>%
+    enframe() %>%
+    arrange(desc(value)) %>%
+    mutate(name = as_factor(name) %>% fct_rev()) %>%
+    ggplot(
+        mapping = aes(
+            x = value,
+            y = name
+        )
+    ) +
+    geom_point() +
+    labs(
+        title = "Ranger Feature Importance",
+        subtitle = "Model 05 Ranger Random Forest Model",
+        x = "",
+        y = ""
+    ) +
+    theme_tq()
 
 
 
