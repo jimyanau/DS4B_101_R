@@ -378,10 +378,42 @@ model_06_rand_forest_randomForest$fit %>%
 ?boost_tree
 ?xgboost::xgboost
 
-
+set.seed(1234)
+model_07_boost_tree_xgboost <- boost_tree(
+        mode = "regression",
+        learn_rate = 0.275,
+        min_n = 4,
+        tree_depth = 7
+    ) %>%
+    set_engine(
+        engine = "xgboost"
+    ) %>%
+    fit(
+        formula = price ~ .,
+        data = train_tbl %>% select(-id, -model, -model_tier),
+        
+    )
+model_07_boost_tree_xgboost %>%
+    calc_metrics(new_data = test_tbl)
 
 # 4.3.2 Feature Importance ----
-
+model_07_boost_tree_xgboost$fit %>%
+    xgboost::xgb.importance(model = .) %>%
+    as_tibble() %>%
+    arrange(desc(Gain)) %>%
+    mutate(Feature = as_factor(Feature) %>% fct_rev()) %>%
+    ggplot(
+        mapping = aes(
+            x = Gain,
+            y = Feature
+        )
+    ) +
+    geom_point() +
+    labs(
+        title = "XGBoost: Feature Importance",
+        subtitle = "Model 07 XGBoost Model"
+    ) +
+    theme_tq()
 
 
 
