@@ -420,7 +420,7 @@ model_07_boost_tree_xgboost$fit %>%
 
 # 5.0 TESTING THE ALGORITHMS OUT ----
 
-bike_features_tbl %>%
+g1 <- bike_features_tbl %>%
     mutate(category_2 = as_factor(category_2) %>% 
                fct_reorder(price)) %>%
     
@@ -455,15 +455,65 @@ new_over_mountain_jekyll <- tibble(
 
 
 # Linear Methods ----
-
+predict(model_03_linear_glmnet, new_data = new_over_mountain_jekyll)
 
 
 # Tree-Based Methods ----
+predict(model_07_boost_tree_xgboost, new_data = new_over_mountain_jekyll)
 
+# Iteration
+models_tbl <- tibble(
+    model_id = str_c("Model 0",1:7),
+    model = list(
+        model_01_linear_lm_simple,
+        model_02_linear_lm_complex,
+        model_03_linear_glmnet,
+        model_04_tree_decision_tree,
+        model_05_rand_forest_ranger,
+        model_06_rand_forest_randomForest,
+        model_07_boost_tree_xgboost
+    )
+)
+models_tbl
 
+# Add predictions
+predictions_new_over_mountain_tbl <- models_tbl %>%
+    mutate(
+        predictions = map(
+            model, 
+            predict, 
+            new_data = new_over_mountain_jekyll
+            )
+        ) %>%
+    unnest(cols = predictions) %>%
+    mutate(category_2 = "Over Mountain") %>%
+    left_join(
+        new_over_mountain_jekyll,
+        by = "category_2"
+    )
+    
+predictions_new_over_mountain_tbl
 
+# Update plot
+g2 <- g1 +
+    geom_point(
+        data = predictions_new_over_mountain_tbl,
+        mapping = aes(
+            y = .pred
+        ),
+        color = "red",
+        alpha = 0.5
+    ) +
+    ggrepel::geom_text_repel(
+        data = predictions_new_over_mountain_tbl,
+        mapping = aes(
+            label = model_id,
+            y = .pred
+        ),
+        size = 3
+    )
 
-
+g2
 
 # 5.2 NEW TRIATHALON MODEL ----
 
@@ -484,14 +534,49 @@ new_triathalon_slice_tbl <- tibble(
 
 
 # Linear Methods ----
-
+predict(model_02_linear_lm_complex, new_data = new_triathalon_slice_tbl)
 
 # Tree-Based Methods ----
+predict(model_06_rand_forest_randomForest, new_data = new_triathalon_slice_tbl)
 
+# Add predictions
+predictions_new_triathalon_slice_tbl <- models_tbl %>%
+    mutate(
+        predictions = map(
+            model, 
+            predict, 
+            new_data = new_triathalon_slice_tbl
+        )
+    ) %>%
+    unnest(cols = predictions) %>%
+    mutate(category_2 = "Triathalon") %>%
+    left_join(
+        new_triathalon_slice_tbl,
+        by = "category_2"
+    )
 
+predictions_new_over_mountain_tbl
 
-
-
+# Vizualize
+g3 <- g2 +
+    geom_point(
+        data = predictions_new_triathalon_slice_tbl,
+        mapping = aes(
+            y = .pred
+        ),
+        color = "red",
+        alpha = 0.5
+    ) +
+    ggrepel::geom_text_repel(
+        data = predictions_new_triathalon_slice_tbl,
+        mapping = aes(
+            label = model_id,
+            y = .pred
+        ),
+        size = 3
+    )
+    
+g3
 
 # 6.0 ADDITIONAL ADVANCED CONCEPTS ----
 
