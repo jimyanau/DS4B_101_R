@@ -591,5 +591,115 @@ g3
 # - AUTOMATIC MACHINE LEARNING - H2O
 
 
+# 7.0 Bonus Pre-processing and SVM Regression ----
+library(recipes)
 
+?recipe
+?step_dummy
+?prep
+?bake
 
+train_tbl
+recipe_obj <- recipe(
+    formula = price ~ .,
+    data = train_tbl
+    ) %>%
+    step_rm(id, model, model_tier) %>%
+    step_dummy(all_nominal(), one_hot = TRUE) %>%
+    step_log(price) %>%
+    step_center(price) %>%
+    step_scale(price) %>%
+    prep()
+
+train_transformed_tbl <- bake(recipe_obj, train_tbl)
+test_transformed_tbl <- bake(recipe_obj, test_tbl)
+tidy(recipe_obj)
+
+scale <- tidy(recipe_obj, 5)
+center <- tidy(recipe_obj, 4)
+log <- tidy(recipe_obj, 3)
+
+# SVM Radial Basis
+?svm_rbf
+?kernlab::ksvm
+model_08_svm_rbf <- svm_rbf(
+    mode = "regression",
+    cost = 13,
+    margin = 0.2
+    ) %>%
+    set_engine(
+        "kernlab",
+        scaled = FALSE
+    ) %>%
+    fit(
+        price ~ .,
+        data = train_transformed_tbl
+    )
+
+model_08_svm_rbf %>%
+    predict(new_data = test_transformed_tbl) %>%
+    mutate(.pred = .pred * scale$value) %>%
+    mutate(.pred = .pred + center$value) %>%
+    mutate(.pred = exp(.pred)) %>%
+    bind_cols(test_tbl %>% select(price)) %>%
+    metrics(
+        truth = price,
+        estimate = .pred
+    )
+
+# Prediction
+bake(recipe_obj, new_over_mountain_jekyll) %>%
+    predict(
+        object = model_08_svm_rbf,
+        new_data = .
+    ) %>%
+    mutate(
+        .pred = .pred * scale$value,
+        .pred = .pred + center$value,
+        .pred = exp(.pred)
+    )
+
+bake(recipe_obj, new_triathalon_slice_tbl) %>%
+    predict(
+        object = model_08_svm_rbf,
+        new_data = .
+    ) %>%
+    mutate(
+        .pred = .pred * scale$value,
+        .pred = .pred + center$value,
+        .pred = exp(.pred)
+    )
+
+# 8.0 Saving and Loading Models ----
+fs::dir_create("00_models")
+
+models_tbl <- list(
+    "MODEL_01__LM_SIMPLE" = model_01_linear_lm_simple,
+    "MODEL_02__LM_COMPLEX" = model_02_linear_lm_complex,
+    "MODEL_03__LM_GLMNET" = model_03_linear_glmnet,
+    "MODEL_04__DECISION_TREE" = model_04_tree_decision_tree,
+    "MODEL_05__RF_RANGER" = model_05_rand_forest_ranger,
+    "MODEL_06__RF_RANDOMFOREST" = model_06_rand_forest_randomForest,
+    "MODEL_07__RF_XGBOOST" = model_07_boost_tree_xgboost,
+    "MODEL_08__SVM" = model_08_svm_rbf
+) %>%
+    enframe(
+        name = "model_id",
+        value = "model"
+    )
+
+models_tbl %>%
+    write_rds("00_models/parsnip_models_tbl.rds")
+
+recipes_tbl <- list(
+    "RECIPE_01" = recipe_obj
+) %>%
+    enframe(
+        name = "recipe_id",
+        value = "recipe"
+    )
+recipes_tbl %>%
+    write_rds("00_models/recipes_tbl.rds")
+
+calc_metrics %>%
+    write_rds("00_scripts//calc_metrics.rds")
