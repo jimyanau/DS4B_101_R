@@ -1,69 +1,5 @@
-# DS4B 101-R: R FOR BUSINESS ANALYSIS ----
-# INTERACTIVE PLOTS ----
-
-# GOAL: DEVELOP INTERACTIVE PLOTS FOR A SALES REPORT
-
-
-# LIBRARIES & DATA ----
-
-# Main
-library(tidyverse)
-library(lubridate)
-
-# Visualization
-library(tidyquant)
-library(plotly)
-
-
-bike_orderlines_tbl <- read_rds("00_data/bike_sales/data_wrangled/bike_orderlines.rds")
-
-# 1.0 TOTAL SALES BY MONTH ----
-
-# 1.1 Preparing Time Series Data ----
-total_sales_m_tbl <- bike_orderlines_tbl %>%
-    select(order_date, total_price) %>%
-    mutate(date_rounded = floor_date(order_date, unit = "month")) %>%
-    group_by(date_rounded) %>%
-    summarise(total_sales = sum(total_price)) %>%
-    ungroup() %>%
-    mutate(label_text = str_glue("Sales: {scales::dollar(total_sales)}
-                                 Date: {date_rounded %>% format('%B %Y')}"))
-
-# Formatting Dates
-# - strftime: https://devhints.io/strftime
-
-
-
-# 1.2 Interactive Plot ----
-
-# Step 1: Create ggplot with text feature
-g1 <- total_sales_m_tbl %>%
-    ggplot(
-        mapping = aes(
-            x = date_rounded,
-            y = total_sales
-        )
-    ) +
-    # Geoms
-    geom_point(
-        mapping = aes(
-            text = label_text
-        )
-    ) +
-    geom_smooth(method = "loess", span = 0.2) +
-    theme_tq() +
-    scale_y_continuous(labels = scales::dollar_format()) +
-    expand_limits(y = 0)
-
-g1
-
-# Step 2: Use ggplotly()
-ggplotly(g1, tooltip = "text")
-
-
-
-# 1.3 Plot Total Sales Function ----
-plot_total_sales <- function(unit = "month",
+plot_total_sales <-
+function(unit = "month",
                              date_format = "%B %Y",
                              interactive = TRUE){
     
@@ -119,74 +55,8 @@ plot_total_sales <- function(unit = "month",
     }
     
 }
-
-
-# 1.4 Test Our Function ----
-plot_total_sales(unit = "month", date_format = "%b %Y", interactive = TRUE)
-
-
-
-
-
-# 2.0 CATEGORY 2 SALES BY MONTH ----
-
-# 2.1 Preparing Time Series Data ----
-category_2_sales_m_tbl <- bike_orderlines_tbl %>%
-    select(order_date, category_1, category_2, total_price) %>%
-    mutate(date_rounded = floor_date(order_date, unit = "month")) %>%
-    group_by(date_rounded, category_1, category_2) %>%
-    summarise(total_sales = sum(total_price)) %>%
-    ungroup() %>%
-    mutate(label_text = str_glue("Sales: {scales::dollar(total_sales)}
-                                 Date: {date_rounded %>% format('%B %Y')}")) %>%
-    mutate(category_2 = as_factor(category_2) %>%
-               fct_reorder2(date_rounded, total_sales))
-
-# 2.2 Interactive Plot ----
-# Step 1: Create ggplot
-g2 <- category_2_sales_m_tbl %>%
-    ggplot(
-        mapping = aes(
-            x = date_rounded,
-            y = total_sales,
-            color = category_2
-        )
-    ) +
-    geom_point(
-        color = "black",
-        aes(
-            text = label_text
-        )
-    ) +
-    geom_smooth(
-        method = "loess",
-        se = FALSE,
-        span = 1/3
-    ) +
-    facet_wrap(~ category_2, scales = "free_y", ncol = 3) +
-    expand_limits(y = 0) +
-    theme_tq() +
-    theme(
-        legend.position = "none",
-        strip.text.x = element_text(
-            margin = margin(5,5,5,5, unit = "pt")
-        )
-    ) +
-    scale_y_continuous(labels = scales::dollar_format(scale = 1e-3, suffix = "K")) +
-    scale_color_tq() +
-    labs(
-        title = "Sales By Category 2",
-        y = "",
-        x = ""
-    )
-
-
-# Step 2: Use ggplotly()
-ggplotly(g2, tooltip = "text")
-
-
-# 2.3 Plot Categories Function ----
-plot_categories <- function(category_1 = "All",
+plot_categories <-
+function(category_1 = "All",
                             category_2 = "All",
                             unit = "month",
                             date_format = "%B %Y",
@@ -284,23 +154,3 @@ plot_categories <- function(category_1 = "All",
     }
     
 }
-
-
-# 2.4 Test Our Function ----
-plot_categories(
-    category_1 = "All", 
-    category_2 = "(Cross Country|Trail)", 
-    unit = "day")
-
-
-
-# 3.0 SAVE FUNCTIONS ----
-fs::file_create("00_scripts/plot_sales.R")
-dump(
-    list = c("plot_total_sales","plot_categories"),
-    file = "00_scripts/plot_sales.R"
-)
- 
-
-
-
