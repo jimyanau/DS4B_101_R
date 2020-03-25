@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
     message = FALSE, 
     warning = FALSE,
     out.width = "100%",
-    out.height = "100%",
+    out.height = "500px",
     dpi = 300
     )
 ```
@@ -37,3 +37,69 @@ pacman::p_load(
 )
 ```
 
+```{r scripts}
+source("../00_scripts/plot_sales.R")
+```
+
+```{r data}
+bike_orderlines_tbl <- read_rds("../00_data/bike_sales/data_wrangled/bike_orderlines.rds")
+```
+
+```{r interactive}
+interactive <- TRUE
+```
+
+# Total Sales Charts {.tabset .tabset-fade .tabset-pills}
+
+## Quarterly Sales Trends
+
+```{r}
+plot_total_sales(unit = "quarter", interactive = interactive)
+```
+
+## Monthly Sales Trends
+```{r}
+plot_total_sales(unit = "month", interactive = interactive)
+```
+
+## Weekly Sales Trends
+```{r}
+plot_total_sales(unit = "week", date_format = "%Y-%m-%d", interactive = interactive)
+```
+
+# Category Sales Charts {.tabset .tabset-fade .tabset-pills}
+
+## Road {.tabset .tabset-fade}
+
+### Quarterly
+```{r fig.height=8}
+plot_categories(category_1 = "Road", ncol = 1, unit = "quarter", interactive = interactive)
+```
+
+### Monthly
+```{r fig.height=8}
+plot_categories(category_1 = "Road", ncol = 1, unit = "month", interactive = interactive)
+```
+
+### Weekly
+```{r fig.height=8}
+plot_categories(category_1 = "Road", ncol = 1, unit = "week", interactive = interactive)
+```
+
+
+## Mountain {.tabset .tabset-fade}
+
+### Quarterly
+```{r fig.height=8}
+plot_categories(category_1 = "Mountain", ncol = 1, unit = "quarter", interactive = interactive)
+```
+
+### Monthly
+```{r fig.height=8}
+plot_categories(category_1 = "Mountain", ncol = 1, unit = "month", interactive = interactive)
+```
+
+### Weekly
+```{r fig.height=8}
+plot_categories(category_1 = "Mountain", ncol = 1, unit = "week", interactive = interactive)
+```

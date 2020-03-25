@@ -45,7 +45,12 @@ function(unit = "month",
         ) +
         theme_tq() +
         scale_y_continuous(labels = scales::dollar_format()) +
-        expand_limits(y = 0)
+        expand_limits(y = 0) +
+        labs(
+            title = "Total Sales",
+            y = "",
+            x = ""
+        )
     
     # Static vs Interactive Logic
     if(interactive) {
