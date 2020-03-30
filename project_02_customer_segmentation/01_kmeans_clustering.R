@@ -256,14 +256,6 @@ plot_customer_behavior_by_cluster <- function(top_n_products = 10,
     
 }
 
-plot_customer_behavior_by_cluster(top_n_products = 10, 
-                                  k = 4, seed = 123,
-                                  interactive = TRUE)
-
-plot_customer_behavior_by_cluster(top_n_products = 10, 
-                                  k = 4, seed = 123,
-                                  interactive = FALSE)
-
 # 5.0 SAVE FUNCTIONS ----
 
 function_names <- c("get_customer_segments", "plot_customer_segments",
