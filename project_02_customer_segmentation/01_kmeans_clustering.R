@@ -222,7 +222,7 @@ plot_customer_behavior_by_cluster <- function(top_n_products = 10,
                                      Price: {scales::dollar(price)}"))
     
     # VISUALIZATION
-    top_n_tbl %>%
+    g <- top_n_tbl %>%
         ggplot(
             mapping = aes(
                 x = category_1,
@@ -231,7 +231,7 @@ plot_customer_behavior_by_cluster <- function(top_n_products = 10,
             )
         ) +
         geom_violin() +
-        geom_jitter(width = .1, alpha = 0.5) +
+        geom_jitter(width = .1, alpha = 0.5, aes(text = label_text)) +
         facet_wrap(~ .cluster, scales = "free_y", ncol = 2) +
         # Formatting
         theme_tq() +
@@ -248,7 +248,11 @@ plot_customer_behavior_by_cluster <- function(top_n_products = 10,
         scale_y_log10(labels = scales::dollar_format(accuracy = 1))
 
     # INTERACTIVE VS STATIC
-
+    if(interactive) {
+        return(ggplotly(g, tooltip = "text"))
+    } else {
+        return(g)
+    }
     
 }
 

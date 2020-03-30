@@ -174,16 +174,64 @@ function(interactive = TRUE) {
 }
 plot_customer_behavior_by_cluster <-
 function(top_n_products = 10, 
-                                              k = 4, seed = 123, 
+                                              k = 4, 
+                                              seed = 123, 
                                               interactive = TRUE) {
     
     # DATA MANIPULATION
+    combined_tbl <- get_customer_segments(k = k, seed = seed)
     
+    top_n_tbl <- bike_orderlines_tbl %>%
+        select(bikeshop_name, model, category_1, category_2, price, quantity) %>%
+        group_by_at(.vars = vars(bikeshop_name:price)) %>%
+        summarise(total_qty = sum(quantity, na.rm = TRUE)) %>%
+        ungroup() %>%
+        group_by(bikeshop_name) %>%
+        arrange(desc(total_qty), .by_group = TRUE) %>%
+        slice(1:top_n_products) %>%
+        ungroup() %>%
+        left_join(
+            combined_tbl %>% 
+                select(bikeshop_name, .cluster)
+            , by = ("bikeshop_name" = "bikeshop_name")
+        ) %>%
+        mutate(label_text = str_glue("Customer: {bikeshop_name}
+                                     Model: {model}
+                                     Category 1: {category_1}
+                                     Category 2: {category_2}
+                                     Price: {scales::dollar(price)}"))
     
     # VISUALIZATION
-    
-    
+    g <- top_n_tbl %>%
+        ggplot(
+            mapping = aes(
+                x = category_1,
+                y = price,
+                color = .cluster
+            )
+        ) +
+        geom_violin() +
+        geom_jitter(width = .1, alpha = 0.5, aes(text = label_text)) +
+        facet_wrap(~ .cluster, scales = "free_y", ncol = 2) +
+        # Formatting
+        theme_tq() +
+        theme(
+            strip.text.x = element_text(margin = margin(5,5,5,5, unit = "pt"))
+        ) +
+        scale_color_tq() +
+        labs(
+            x = "Category 1",
+            y = "Unit Price (Log Scale)",
+            title = str_glue("Top {top_n_products} Bike Models by Customer and Cluster"),
+            color = "Cluster"
+        ) +
+        scale_y_log10(labels = scales::dollar_format(accuracy = 1))
+
     # INTERACTIVE VS STATIC
-    
+    if(interactive) {
+        return(ggplotly(g, tooltip = "text"))
+    } else {
+        return(g)
+    }
     
 }
